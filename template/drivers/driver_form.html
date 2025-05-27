@@ -1,0 +1,7 @@
+<h1>{{heading}}</h1>
+<form method='POST' enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <a href="{% url 'driver_list' %}"><button type="button">Back</button></a>
+    <button type="submit">Save</button>
+</form>

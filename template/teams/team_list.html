@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teams</title>
+</head>
+<body>
+    <h1>Teams</h1>
+    {% if messages %}
+    <ul>
+         {% for message in messages %}
+            <li>{{ message }}</li>
+         {% endfor %}
+    </ul>
+    {% endif %}
+    <table border="1" style="border-collapse: collapse;">
+            <tr>
+                <th>Team Name</th>
+                <th>City</th>
+                <th>Country</th>
+                <th>Drivers</th>
+                <th>Logo</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+            {% if teams %}
+            {% for team in teams %}
+            <tr>
+                <td>{{ team.team_name }}</td>
+                <td>{{ team.city }}</td>
+                <td>{{ team.country }}</td>
+                <td>
+                    {% if team.drivers.all %}
+                        {% for driver in team.drivers.all %}
+                            {{ driver.first_name }} {{ driver.last_name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{team.logo_image.url}}" target="_blank">Logo</a>
+                 </td>
+                <td>{% if team.description %}
+                        {{ team.description }}
+                    {% else %}
+                        None
+                    {% endif %}
+                    </td>
+                <td><form action="{% url 'team_edit' team.id %}" method="get" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit">Edit</button>
+                    </form>
+                    <form action="{% url 'team_delete' team.id %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" onclick="return confirm('Are you sure yo want to delete this team?');">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+    </table>
+    <br>
+    <a href="{% url 'home' %}"><button type="submit">Home</button></a>
+    <a href="{% url 'team_create' %}"><button type="submit">Create</button></a>
+    <div id="react-root"></div>
+    <script src="/static/js/main.js"></script>
+    
+</body>
+</html>

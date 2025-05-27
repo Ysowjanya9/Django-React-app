@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Home</title>
+</head>
+<body>
+    <h1>Welcome to Racing Application</h1>
+    <ol>
+        <li><a href="{% url 'team_list' %}">Teams</a></li>
+        <li><a href="{% url 'driver_list' %}">Drivers</a></li>
+        <li><a href="{% url 'race_list' %}">Races</a></li>
+    </ol>
+    <div id="react-root"></div>
+    <script src="/static/js/main.js"></script>
+
+</body>
+</html>
