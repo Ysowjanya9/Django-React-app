@@ -1,62 +1,86 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Drivers</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
 </head>
 <body>
     <h1>Drivers</h1>
     {% if messages %}
-    <ul>
-         {% for message in messages %}
-            <li>{{ message }}</li>
-         {% endfor %}
-    </ul>
-    {% endif %}
-    <table border="1" style="border-collapse: collapse;">
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Date of Birth</th>
-            <th>Belonged Team</th>
-            <th>Completed Races</th>
-            <th>Upcoming Races</th>
-            <th>Actions</th>
-        </tr>
-        {% for driver in drivers %}
-        <tr>
-            <td>{{ driver.first_name }}</td>
-            <td>{{ driver.last_name }}</td>
-            <td>{{ driver.date_of_birth }}</td>
-            <td>{{ driver.team.team_name }}</td>
-            <td>
-                {% for race in driver.completed_races %}
-                    {{ race.track_name }}{% if not forloop.last %}, {% endif %}
-                {% empty %}
-                    No Completed races
-                {% endfor %}
-            </td>
-            <td>
-                {% for race in driver.upcoming_races %}
-                    {{ race.track_name }}{% if not forloop.last %}, {% endif %}
-                {% empty %}
-                    No Upcoming races
-                {% endfor %}
-            </td>
-            <td>
-                <form method="get" action="{% url 'driver_edit' driver.id %}" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit">Edit</button>
-                </form>
-                <form action="{% url 'driver_delete' driver.id %}" method="post" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" onclick="return confirm('Are you sure yo want to delete this driver?');">Delete</button>
-                </form>
-            </td>
-        </tr>
+    <ul id="message-container">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
         {% endfor %}
-    </table>
+    </ul>
+    <script>
+    setTimeout(function() {
+      const container = document.getElementById('message-container');
+      if (container) {
+        container.style.display = 'none';
+      }
+    }, 1000);
+    </script>
+    {% endif %}
+    <form method="post" action="{% url 'driver_delete' %}">
+        {% csrf_token %}
+        <table border="1">
+            <tr>
+                <th>Driver Name</th>
+                <th>Date of Birth</th>
+                <th>Belonged Team</th>
+                <th>Completed Races</th>
+                <th>Upcoming Races</th>
+                <th>Checkbox <input type="checkbox" id="select-all"></th>
+            </tr>
+            {% for driver in drivers %}
+            <tr>
+                <td class="name"><a href="{% url 'driver_view' driver.id %}">{{ driver.first_name }} {{ driver.last_name }}</td></a>
+                <td>{{ driver.date_of_birth }}</td>
+                <td>{{ driver.team.team_name | default:'None' }}</td>
+                <td>
+                    {% for race in driver.completed_races %}
+                        {{ race.track_name }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        No Completed races
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for race in driver.upcoming_races %}
+                        {{ race.track_name }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        No Upcoming races
+                    {% endfor %}
+                </td>
+                <td>
+                    <input type="checkbox" name="driver_ids" value="{{ driver.id }}">
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
     <br>
-    <a href="{% url 'home' %}"><button type="submit">Home</button></a>
+    <button id="delete-button" type="submit" onclick="return confirm('Are you sure yo want to delete this driver?');">Delete</button>
+    </form>
+    <br>
+    <br>
+    <a href="{% url 'home' %}"><button type="button">Home</button></a>
     <a href="{% url 'driver_create' %}"><button type="submit">Create</button></a>
+   <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectAll = document.getElementById('select-all')
+        const checkboxes = document.querySelectorAll('input[name="driver_ids"]');
+        const deleteButton = document.getElementById('delete-button');
+        function toggleDeleteButton() {
+            const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+            deleteButton.disabled = !anyChecked;
+        }
+        checkboxes.forEach(cb => cb.addEventListener('change', toggleDeleteButton));
+        selectAll.addEventListener('change', function () {
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            toggleDeleteButton();
+        });
+        toggleDeleteButton();
+    });
+    </script>
 </body>
 </html>

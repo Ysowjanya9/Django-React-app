@@ -1,7 +1,9 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
 <h1>{{heading}}</h1>
 <form method='POST' enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
-    <a href="{% url 'team_list' %}"><button type="button">Back</button></a>
+    <a href="{% url 'team_list' %}"><button type="button">Close</button></a>
     <button type="submit">Save</button>
 </form>

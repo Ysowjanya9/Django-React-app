@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ team.team_name }}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+        <h1>Details of {{ team.team_name }}</h1>
+        <p><strong>Name:</strong> {{ team.team_name }}</p>
+        <p><strong>City:</strong> {{ team.city }}</p>
+        <p><strong>Country:</strong> {{ team.country }}</p>
+        <p><strong>Logo:</strong>
+            {% if team.logo_image %}
+                <img src="{{ team.logo_image.url }}" alt="Team Logo" class="team-logo">
+            {% else %}
+                No logo available.
+            {% endif %}
+        </p>
+        <p><strong>Description:</strong> {{ team.description|default:"None" }}</p>
+        <p><strong>Drivers:</strong>
+            {% for driver in team.drivers.all %}
+                {{ driver.first_name }} {{ driver.last_name }}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+                None
+            {% endfor %}
+        </p>
+        <a href="{% url 'team_list' %}"><button type="button">Close</button></a>
+        <a href="{% url 'team_edit' team.id %}" style="display: inline;"><button type="submit">Edit</button></a>
+</body>
+</html>

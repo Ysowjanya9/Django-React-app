@@ -1,0 +1,47 @@
+table {
+    border-collapse: collapse;
+}
+#message-container li.success {
+    color: #155724;
+}
+#message-container li.error {
+    color: #721c24;
+}
+.name a {
+    text-decoration: none;
+}
+form {
+    display: inline;
+}
+.team-logo {
+    vertical-align: middle; 
+    margin-left: 10px; 
+    max-height: 100px; 
+    border-radius: 8px;
+}
+.driver-races {
+    display: flex;
+}
+.driver-races ol {
+    margin-top: 0px;
+    padding-left: 20px;
+}
+form p {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+form p label {
+    font-weight: bold;
+    width: 180px;
+}
+
+form p textarea {
+    height: 20px;
+    width: 165px;
+}
+
+button:disabled {
+    cursor: not-allowed;
+}

@@ -1,67 +1,94 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Teams</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
 </head>
 <body>
     <h1>Teams</h1>
     {% if messages %}
-    <ul>
-         {% for message in messages %}
-            <li>{{ message }}</li>
-         {% endfor %}
+    <ul id="message-container">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
     </ul>
+    <script>
+    setTimeout(function() {
+      const container = document.getElementById('message-container');
+      if (container) {
+        container.style.display = 'none';
+      }
+    }, 2000);
+    </script>
     {% endif %}
-    <table border="1" style="border-collapse: collapse;">
-            <tr>
-                <th>Team Name</th>
-                <th>City</th>
-                <th>Country</th>
-                <th>Drivers</th>
-                <th>Logo</th>
-                <th>Description</th>
-                <th>Actions</th>
-            </tr>
-            {% if teams %}
-            {% for team in teams %}
-            <tr>
-                <td>{{ team.team_name }}</td>
-                <td>{{ team.city }}</td>
-                <td>{{ team.country }}</td>
-                <td>
-                    {% if team.drivers.all %}
-                        {% for driver in team.drivers.all %}
-                            {{ driver.first_name }} {{ driver.last_name }}{% if not forloop.last %}, {% endif %}
+
+    <form method="post" action="{% url 'team_delete' %}">
+        {% csrf_token %}
+        <table border="1">
+                <tr>
+                    <th>Team Name</th>
+                    <th>City</th>
+                    <th>Country</th>
+                    <th>Drivers</th>
+                    <th>Logo</th>
+                    <th>Description</th>
+                    <th>Checkbox<input type="checkbox" id="select-all"></th>
+                </tr>
+                {% if teams %}
+                {% for team in teams %}
+                <tr>
+                    <td class="name"><a href="{% url 'team_view' team.id %}">{{ team.team_name }}</a></td>
+                    <td>{{ team.city }}</td>
+                    <td>{{ team.country }}</td>
+                    <td>
+                        {% if team.drivers.all %}
+                            {% for driver in team.drivers.all %}
+                                {{ driver.first_name }} {{ driver.last_name }}{% if not forloop.last %}, {% endif %}
                             {% endfor %}
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{{team.logo_image.url}}" target="_blank">Logo</a>
-                 </td>
-                <td>{% if team.description %}
-                        {{ team.description }}
-                    {% else %}
-                        None
-                    {% endif %}
+                        {% else %}
+                            None
+                        {% endif %}
                     </td>
-                <td><form action="{% url 'team_edit' team.id %}" method="get" style="display: inline;">
-                        {% csrf_token %}
-                        <button type="submit">Edit</button>
-                    </form>
-                    <form action="{% url 'team_delete' team.id %}" method="post" style="display: inline;">
-                        {% csrf_token %}
-                        <button type="submit" onclick="return confirm('Are you sure yo want to delete this team?');">Delete</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-            {% endif %}
-    </table>
+                    <td>
+                        <a href="{{team.logo_image.url}}" target="_blank">Logo</a>
+                    </td>
+                    <td>{% if team.description %}
+                            {{ team.description }}
+                        {% else %}
+                            None
+                        {% endif %}
+                        </td>
+                    <td>
+                        <input type="checkbox" name="team_ids" value="{{ team.id }}">
+                    </td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+        </table>
     <br>
-    <a href="{% url 'home' %}"><button type="submit">Home</button></a>
+    <button id="delete-button" type="submit" onclick="return confirm('Are you sure yo want to delete this team?');">Delete</button>
+    </form>
+    <br>
+    <br>
+    <a href="{% url 'home' %}"><button type="button">Home</button></a>
     <a href="{% url 'team_create' %}"><button type="submit">Create</button></a>
-    <div id="react-root"></div>
-    <script src="/static/js/main.js"></script>
-    
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectAll = document.getElementById('select-all')
+        const checkboxes = document.querySelectorAll('input[name="team_ids"]');
+        const deleteButton = document.getElementById('delete-button');
+        function toggleDeleteButton() {
+            const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+            deleteButton.disabled = !anyChecked;
+        }
+        checkboxes.forEach(cb => cb.addEventListener('change', toggleDeleteButton));
+        selectAll.addEventListener('change', function () {
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            toggleDeleteButton();
+        });
+        toggleDeleteButton();
+    });
+    </script>
 </body>
 </html>

@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ driver.first_name }} {{ driver.last_name }}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <h1>Details of {{ driver.first_name }} {{ driver.last_name }}</h1>
+
+    <p><strong>First Name:</strong> {{ driver.first_name }}</p>
+    <p><strong>Last Name:</strong> {{ driver.last_name }}</p>
+    <p><strong>Date of Birth:</strong> {{ driver.date_of_birth }}</p>
+    <p><strong>Team:</strong>
+        {% if driver.team %} {{ driver.team.team_name }} {% else %} None.
+        {% endif %}
+    </p>
+    <div class="driver-races">
+        <strong>Completed Races:</strong>
+        <ol>
+            {% for race in driver.completed_races %}
+                    <li>{{ race.track_name }} - held on {{ race.race_date }}.</li>
+                {% empty %}
+                    No Completed races available.
+                {% endfor %}
+        </ol>
+    </div>
+    <div class="driver-races">
+        <strong>Upcoming Races:</strong>
+        <ol>
+            {% for race in driver.upcoming_races %}
+                    <li>{{ race.track_name }} - scheduled for {{ race.race_date }}, registration closes on {{ race.registration_closure_date | default:'(no data available).'}}</li>
+                {% empty %}
+                    No Upcoming races available.
+                {% endfor %}
+        </ol>    
+    </div>
+
+    <a href="{% url 'driver_list' %}"><button type="button">Close</button></a>
+    <a href="{% url 'driver_edit' driver.id %}"><button type="submit">Edit</button></a>
+</body>
+</html>

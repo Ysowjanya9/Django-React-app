@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ race.track_name }}</title>
+</head>
+<body>
+    <h1>Details of {{ race.track_name }}</h1>
+
+    <p><strong>Track Name:</strong> {{ race.track_name }}</p>
+    <p><strong>City:</strong> {{ race.city }}</p>
+    <p><strong>Country:</strong> {{ race.country }}</p>
+    <p><strong>Race Date:</strong> {{ race.race_date }}</p>
+    <p><strong>Registration Closure Date:</strong> {{ race.registration_closure_date }}</p>
+    <div style="display: flex;">
+        <strong>Registered Drivers:</strong>
+        <ol style="margin-top: 0px;padding-left: 20px;">
+            {% for driver in race.driver.all %}
+            <li>{{ driver.first_name }} {{ driver.last_name }} {% if driver.team.team_name %} from <strong>{{ driver.team.team_name }}.</strong> {% else %} (not assigned to any team). {% endif %}</li>
+        {% empty %}
+            No drivers registered.
+        {% endfor %}
+        </ol>
+    </div>
+
+    <a href="{% url 'race_list' %}"><button type="button">Close</button></a>
+    <a href="{% url 'race_edit' race.id %}"><button type="submit">Edit</button></a>
+</body>
+</html>

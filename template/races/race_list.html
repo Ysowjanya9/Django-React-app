@@ -1,57 +1,82 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Races</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
 </head>
 <body>
     <h1>Races</h1>
     {% if messages %}
-    <ul>
-         {% for message in messages %}
-            <li>{{ message }}</li>
-         {% endfor %}
-    </ul>
-    {% endif %}
-
-    <table border="1" style="border-collapse: collapse;">
-        <tr>
-            <th>Track Name</th>
-            <th>City</th>
-            <th>Country</th>
-            <th>Race Date</th>
-            <th>Registration Closure Date</th>
-            <th>Registered Drivers</th>
-            <th>Actions</th>
-        </tr>
-        {% for race in races %}
-        <tr>
-            <td>{{ race.track_name }}</td>
-            <td>{{ race.city }}</td>
-            <td>{{ race.country }}</td>
-            <td>{{ race.race_date }}</td>
-            <td>{{ race.registration_closure_date }}</td>
-            <td>
-                {% for driver in race.driver.all %}
-                    {{ driver.first_name }} {{ driver.last_name }}{% if not forloop.last %}, {% endif %}
-                {% empty %}
-                    None
-                {% endfor %}
-                </td>
-            <td>
-                <form method="get" action="{% url 'race_edit' race.id %}" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit">Edit</button>
-            </form>
-                <form action="{% url 'race_delete' race.id %}" method="post" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" onclick="return confirm('Are you sure yo want to delete this race?');">Delete</button>
-                </form>
-            </td>
-        </tr>
+    <ul id="message-container">
+        {% for message in messages %}
+            <li class="{{ message.tag }}">{{ message }}</li>
         {% endfor %}
-    </table>
+    </ul>
+    <script>
+    setTimeout(function() {
+      const container = document.getElementById('message-container');
+      if (container) {
+        container.style.display = 'none';
+      }
+    }, 1000);
+    </script>
+    {% endif %}
+    <form method="post" action="{% url 'race_delete' %}">
+        {% csrf_token %}
+        <table border="1">
+            <tr>
+                <th>Track Name</th>
+                <th>City</th>
+                <th>Country</th>
+                <th>Race Date</th>
+                <th>Registration Closure Date</th>
+                <th>Registered Drivers</th>
+                <th>Checkbox <input type="checkbox" id="select-all"></th>
+            </tr>
+            {% for race in races %}
+            <tr>
+                <td class="name"><a href="{% url 'race_view' race.id %}">{{ race.track_name }}</a></td>
+                <td>{{ race.city }}</td>
+                <td>{{ race.country }}</td>
+                <td>{{ race.race_date }}</td>
+                <td>{{ race.registration_closure_date | default:'Not provided.' }}</td>
+                <td>
+                    {% for driver in race.driver.all %}
+                        {{ driver.first_name }} {{ driver.last_name }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        None
+                    {% endfor %}
+                    </td>
+                <td>
+                    <input type="checkbox" name="race_ids" value="{{ race.id }}">
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
     <br>
-    <a href="{% url 'home' %}"><button type="submit">Home</button></a>
+    <button id="delete-button" type="submit" onclick="return confirm('Are you sure yo want to delete this race?');">Delete</button>
+    </form>
+    <br>
+    <br>
+    <a href="{% url 'home' %}"><button type="button">Home</button></a>
     <a href="{% url 'race_create' %}"><button type="submit">Create</button></a>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectAll = document.getElementById('select-all')
+        const checkboxes = document.querySelectorAll('input[name="race_ids"]');
+        const deleteButton = document.getElementById('delete-button');
+        function toggleDeleteButton() {
+            const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+            deleteButton.disabled = !anyChecked;
+        }
+        checkboxes.forEach(cb => cb.addEventListener('change', toggleDeleteButton));
+        selectAll.addEventListener('change', function () {
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            toggleDeleteButton();
+        });
+        toggleDeleteButton();
+    });
+    </script>
 </body>
 </html>
