@@ -4,5 +4,5 @@ racing\forms.py:29:8: W5104: Use explicit fields instead of exclude in ModelForm
 racing\tests.py:1:0: W0611: Unused TestCase imported from django.test (unused-import)
 
 ------------------------------------------------------------------
-Your code has been rated at 9.95/10 (previous run: 9.95/10, +0.00)
+Your code has been rated at 9.95/10 (previous run: 9.93/10, +0.02)
 
